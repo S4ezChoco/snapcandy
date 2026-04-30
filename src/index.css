@@ -1,0 +1,136 @@
+/* Google Fonts — must be before tailwindcss import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Pacifico&display=swap');
+
+@import "tailwindcss";
+
+/* Tailwind v4 custom theme */
+@theme {
+  --color-dark-teal: #0a1628;
+  --color-navy: #1a2a4a;
+  --color-accent: #f4a261;
+  --color-coral: #e07a5f;
+  --color-glass-bg: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+
+  --font-heading: 'Pacifico', cursive;
+  --font-body: 'Inter', sans-serif;
+}
+
+/* Base styles */
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--color-dark-teal) 0%, var(--color-navy) 50%, #0d1f3c 100%);
+  color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-12px);
+  transition: opacity 200ms ease-in, transform 200ms ease-in;
+}
+
+/* Fade-in utility for step content */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-in {
+  animation: fadeSlideIn 0.4s ease-out both;
+}
+
+/* Custom scrollbar (dark theme) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 22, 40, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 162, 97, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 162, 97, 0.5);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 162, 97, 0.3) rgba(10, 22, 40, 0.5);
+}
+
+/* Responsive message for small viewports */
+.small-viewport-message {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .small-viewport-message {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-dark-teal) 0%, var(--color-navy) 100%);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .small-viewport-message p {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 320px;
+  }
+
+  .small-viewport-message .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .small-viewport-message .accent {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .app-content {
+    display: none;
+  }
+}
