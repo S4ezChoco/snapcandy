@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePhotoboothStore } from '../../store/usePhotoboothStore';
 import { useWebcam } from '../../hooks/useWebcam';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { useCountdown } from '../../hooks/useCountdown';
 import WebcamView from './WebcamView';
 import CaptureButton from './CaptureButton';
 import CaptureControls from './CaptureControls';
 import PhotoThumbnails from './PhotoThumbnails';
+import RippleButton from '../shared/RippleButton';
 
 export default function CameraScreen() {
   const navigate = useNavigate();
@@ -115,6 +117,12 @@ export default function CameraScreen() {
     }
   }, [captureSettings.mode, handleAutoCapture, handleManualCapture, resetCountdown, isCountingDown]);
 
+  const shortcuts = useMemo(() => ({
+    onCapture: handleCaptureClick,
+  }), [handleCaptureClick]);
+
+  useKeyboardShortcuts(shortcuts);
+
   // Handle fullscreen toggle
   useEffect(() => {
     const videoEl = videoRef.current;
@@ -163,15 +171,15 @@ export default function CameraScreen() {
       </h1>
       <p
         data-testid="photo-counter"
-        className="text-white/50 text-sm mb-6"
+        className="text-white/60 text-sm mb-6"
       >
         {counterText}
       </p>
 
       {/* Main content: webcam + thumbnails */}
-      <div className="flex gap-6 items-start w-full justify-center">
+      <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start w-full justify-center">
         {/* Webcam feed area */}
-        <div className="flex flex-col items-center gap-5 flex-1 max-w-[640px]">
+        <div className="flex flex-col items-center gap-5 w-full lg:flex-1 lg:max-w-[40rem] px-4 lg:px-0">
           <WebcamView
             videoRef={videoRef}
             mirrored={captureSettings.mirrored}
@@ -193,7 +201,7 @@ export default function CameraScreen() {
           />
         </div>
 
-        {/* Thumbnails panel on the right */}
+        {/* Thumbnails panel: horizontal row on tablet, vertical column on desktop */}
         <div className="flex-shrink-0">
           <PhotoThumbnails
             photos={capturedPhotos}
@@ -213,7 +221,7 @@ export default function CameraScreen() {
           &lt; Change Theme
         </button>
 
-        <button
+        <RippleButton
           type="button"
           data-testid="capture-next-button"
           disabled={!allCaptured || isRetakeMode}
@@ -222,12 +230,12 @@ export default function CameraScreen() {
             'rounded-full px-10 py-3 text-base font-semibold transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-accent/60 focus:ring-offset-2 focus:ring-offset-dark-teal',
             allCaptured && !isRetakeMode
-              ? 'bg-accent text-white shadow-lg shadow-accent/30 hover:scale-105 hover:shadow-xl hover:shadow-accent/40 cursor-pointer'
+              ? 'bg-accent text-white shadow-md shadow-accent/30 hover:scale-105 hover:shadow-lg hover:shadow-accent/40 cursor-pointer'
               : 'bg-white/10 text-white/30 cursor-not-allowed',
           ].join(' ')}
         >
           Next
-        </button>
+        </RippleButton>
       </div>
     </div>
   );

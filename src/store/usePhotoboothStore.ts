@@ -2,7 +2,12 @@ import { create } from 'zustand';
 import type { LayoutConfig } from '../types/layout';
 import type { ThemeConfig } from '../types/theme';
 import type { CapturedPhoto, CaptureSettings } from '../types/capture';
-import type { Customization } from '../types/customization';
+import type { Customization, FilterType } from '../types/customization';
+import type { ToastItem } from '../types/ui';
+
+const MAX_VISIBLE_TOASTS = 5;
+
+let toastCounter = 0;
 
 export interface PhotoboothStore {
   // State
@@ -15,6 +20,8 @@ export interface PhotoboothStore {
   retakeIndex: number | null;
   isExporting: boolean;
   exportProgress: number;
+  toasts: ToastItem[];
+  previewFilter: FilterType | null | undefined; // undefined = no preview active, null/'none' = preview "no filter", FilterType = preview that filter
 
   // Actions
   setLayout: (layout: LayoutConfig) => void;
@@ -26,6 +33,9 @@ export interface PhotoboothStore {
   updateCustomizations: (updates: Partial<Customization>) => void;
   resetAll: () => void;
   goToStep: (step: number) => void;
+  addToast: (toast: Omit<ToastItem, 'id' | 'createdAt'>) => void;
+  removeToast: (id: string) => void;
+  setPreviewFilter: (filter: FilterType | null | undefined) => void;
 }
 
 const defaultCaptureSettings: CaptureSettings = {
@@ -65,6 +75,8 @@ export const usePhotoboothStore = create<PhotoboothStore>((set) => ({
   retakeIndex: null,
   isExporting: false,
   exportProgress: 0,
+  toasts: [],
+  previewFilter: undefined,
 
   // Actions
   setLayout: (layout) => set({ selectedLayout: layout }),
@@ -107,7 +119,31 @@ export const usePhotoboothStore = create<PhotoboothStore>((set) => ({
       retakeIndex: null,
       isExporting: false,
       exportProgress: 0,
+      toasts: [],
+      previewFilter: undefined,
     }),
 
   goToStep: (step) => set({ currentStep: step }),
+
+  addToast: (toast) =>
+    set((state) => {
+      const newToast: ToastItem = {
+        ...toast,
+        id: `toast-${++toastCounter}`,
+        createdAt: Date.now(),
+      };
+      const updated = [...state.toasts, newToast];
+      // Cap at MAX_VISIBLE_TOASTS by removing oldest first
+      if (updated.length > MAX_VISIBLE_TOASTS) {
+        return { toasts: updated.slice(updated.length - MAX_VISIBLE_TOASTS) };
+      }
+      return { toasts: updated };
+    }),
+
+  removeToast: (id) =>
+    set((state) => ({
+      toasts: state.toasts.filter((t) => t.id !== id),
+    })),
+
+  setPreviewFilter: (filter) => set({ previewFilter: filter }),
 }));

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { usePhotoboothStore } from '../../store/usePhotoboothStore';
+import ConfirmationDialog from '../shared/ConfirmationDialog';
 
 const SunIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -34,6 +36,8 @@ export default function AdjustPanel() {
   const updateCustomizations = usePhotoboothStore((s) => s.updateCustomizations);
   const { adjustments } = customizations;
 
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
   const updateAdjustment = (key: keyof typeof adjustments, value: number) => {
     updateCustomizations({
       adjustments: { ...adjustments, [key]: value },
@@ -52,10 +56,10 @@ export default function AdjustPanel() {
         const val = adjustments[key];
         const pct = ((val + 100) / 200) * 100;
         return (
-          <div key={key} className="space-y-1.5">
+          <div key={key} className="space-y-2">
             <label className="flex items-center justify-between text-sm text-white/70">
-              <span className="flex items-center gap-1.5">
-                <span className="text-white/50">{icon}</span>
+              <span className="flex items-center gap-2">
+                <span className="text-white/60">{icon}</span>
                 {label}
               </span>
               <span className="text-xs font-mono text-accent tabular-nums w-10 text-right">{val}</span>
@@ -80,7 +84,7 @@ export default function AdjustPanel() {
               />
               <div
                 className="absolute w-3.5 h-3.5 rounded-full bg-accent border-2 border-white shadow-sm pointer-events-none"
-                style={{ left: `calc(${pct}% - 7px)` }}
+                style={{ left: `calc(${pct}% - 0.4375rem)` }}
               />
             </div>
           </div>
@@ -89,11 +93,25 @@ export default function AdjustPanel() {
 
       <button
         type="button"
-        onClick={resetAll}
-        className="w-full py-2 text-xs rounded-lg bg-white/5 border border-white/10 text-white/50 hover:bg-white/10 hover:text-white/70 transition-colors cursor-pointer mt-1"
+        onClick={() => setShowResetConfirm(true)}
+        className="w-full py-2 text-xs rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white/70 transition-colors duration-150 cursor-pointer mt-1"
       >
         Reset All
       </button>
+
+      {/* Confirmation dialog for Reset All */}
+      <ConfirmationDialog
+        open={showResetConfirm}
+        title="Reset All Adjustments?"
+        message="This will reset brightness, contrast, and saturation to their default values."
+        confirmLabel="Reset"
+        variant="default"
+        onConfirm={() => {
+          setShowResetConfirm(false);
+          resetAll();
+        }}
+        onCancel={() => setShowResetConfirm(false)}
+      />
     </div>
   );
 }

@@ -167,4 +167,89 @@ describe('usePhotoboothStore', () => {
       expect(state.exportProgress).toBe(0);
     });
   });
+
+  describe('toast slice', () => {
+    it('starts with an empty toasts array', () => {
+      const state = usePhotoboothStore.getState();
+      expect(state.toasts).toEqual([]);
+    });
+
+    it('addToast adds a toast with generated id and createdAt', () => {
+      const store = usePhotoboothStore.getState();
+      store.addToast({ type: 'success', message: 'Saved!', duration: 3000 });
+
+      const state = usePhotoboothStore.getState();
+      expect(state.toasts).toHaveLength(1);
+      expect(state.toasts[0].type).toBe('success');
+      expect(state.toasts[0].message).toBe('Saved!');
+      expect(state.toasts[0].duration).toBe(3000);
+      expect(state.toasts[0].id).toBeDefined();
+      expect(state.toasts[0].id.length).toBeGreaterThan(0);
+      expect(state.toasts[0].createdAt).toBeGreaterThan(0);
+    });
+
+    it('addToast generates unique ids for each toast', () => {
+      const store = usePhotoboothStore.getState();
+      store.addToast({ type: 'success', message: 'First', duration: 3000 });
+      store.addToast({ type: 'error', message: 'Second', duration: 5000 });
+
+      const state = usePhotoboothStore.getState();
+      expect(state.toasts).toHaveLength(2);
+      expect(state.toasts[0].id).not.toBe(state.toasts[1].id);
+    });
+
+    it('addToast preserves optional action field', () => {
+      const store = usePhotoboothStore.getState();
+      const action = { label: 'Try Again', onClick: () => {} };
+      store.addToast({ type: 'error', message: 'Failed', duration: 5000, action });
+
+      const state = usePhotoboothStore.getState();
+      expect(state.toasts[0].action).toBeDefined();
+      expect(state.toasts[0].action!.label).toBe('Try Again');
+    });
+
+    it('removeToast removes a toast by id', () => {
+      const store = usePhotoboothStore.getState();
+      store.addToast({ type: 'success', message: 'First', duration: 3000 });
+      store.addToast({ type: 'info', message: 'Second', duration: 2000 });
+
+      const toasts = usePhotoboothStore.getState().toasts;
+      expect(toasts).toHaveLength(2);
+
+      store.removeToast(toasts[0].id);
+      const updated = usePhotoboothStore.getState().toasts;
+      expect(updated).toHaveLength(1);
+      expect(updated[0].message).toBe('Second');
+    });
+
+    it('removeToast is a no-op for non-existent id', () => {
+      const store = usePhotoboothStore.getState();
+      store.addToast({ type: 'success', message: 'Test', duration: 3000 });
+      store.removeToast('non-existent-id');
+
+      expect(usePhotoboothStore.getState().toasts).toHaveLength(1);
+    });
+
+    it('caps visible toasts at 5 by removing oldest', () => {
+      const store = usePhotoboothStore.getState();
+      for (let i = 0; i < 7; i++) {
+        store.addToast({ type: 'info', message: `Toast ${i}`, duration: 2000 });
+      }
+
+      const state = usePhotoboothStore.getState();
+      expect(state.toasts).toHaveLength(5);
+      // The oldest two (Toast 0, Toast 1) should have been removed
+      expect(state.toasts[0].message).toBe('Toast 2');
+      expect(state.toasts[4].message).toBe('Toast 6');
+    });
+
+    it('resetAll clears toasts', () => {
+      const store = usePhotoboothStore.getState();
+      store.addToast({ type: 'success', message: 'Test', duration: 3000 });
+      expect(usePhotoboothStore.getState().toasts).toHaveLength(1);
+
+      store.resetAll();
+      expect(usePhotoboothStore.getState().toasts).toEqual([]);
+    });
+  });
 });

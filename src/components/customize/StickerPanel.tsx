@@ -9,6 +9,7 @@ const STICKER_OPTIONS = [
 export default function StickerPanel() {
   const customizations = usePhotoboothStore((s) => s.customizations);
   const updateCustomizations = usePhotoboothStore((s) => s.updateCustomizations);
+  const addToast = usePhotoboothStore((s) => s.addToast);
 
   const addSticker = (emoji: string) => {
     // Randomize position so stickers don't all stack at center
@@ -23,6 +24,7 @@ export default function StickerPanel() {
     updateCustomizations({
       stickers: [...customizations.stickers, newSticker],
     });
+    addToast({ type: 'info', message: 'Sticker added', duration: 2000 });
   };
 
   const removeSticker = (id: string) => {
@@ -33,7 +35,7 @@ export default function StickerPanel() {
 
   return (
     <div className="p-3 space-y-3" data-testid="sticker-panel">
-      <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider">Tap to add to strip</p>
+      <p className="text-[0.625rem] text-white/60 font-medium uppercase tracking-wider">Tap to add to strip</p>
       {/* Sticker grid */}
       <div className="grid grid-cols-5 gap-1">
         {STICKER_OPTIONS.map((emoji) => (
@@ -41,7 +43,7 @@ export default function StickerPanel() {
             key={emoji}
             type="button"
             onClick={() => addSticker(emoji)}
-            className="w-10 h-10 flex items-center justify-center text-lg rounded-md bg-white/[0.03] border border-white/[0.06] hover:bg-white/10 hover:border-white/20 hover:scale-110 transition-all duration-150 cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center text-lg rounded-lg bg-white/[0.03] border border-white/[0.06] hover:bg-white/10 hover:border-white/20 hover:scale-110 transition-all duration-150 cursor-pointer animate-sticker-pop-in"
             aria-label={`Add ${emoji} sticker`}
           >
             {emoji}
@@ -52,17 +54,17 @@ export default function StickerPanel() {
       {/* Active stickers */}
       {customizations.stickers.length > 0 && (
         <div className="pt-2 border-t border-white/[0.06]">
-          <p className="text-xs text-white/40 mb-2 flex items-center justify-between">
+          <p className="text-xs text-white/60 mb-2 flex items-center justify-between">
             <span>Active</span>
             <span className="text-accent tabular-nums">{customizations.stickers.length}</span>
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {customizations.stickers.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => removeSticker(s.id)}
-                className="w-8 h-8 flex items-center justify-center text-base rounded-md bg-white/[0.06] hover:bg-red-500/20 hover:ring-1 hover:ring-red-500/30 transition-all cursor-pointer"
+                className="w-8 h-8 flex items-center justify-center text-base rounded-lg bg-white/[0.06] hover:bg-red-500/20 hover:ring-1 hover:ring-red-500/30 transition-all duration-150 cursor-pointer animate-sticker-pop-in"
                 aria-label={`Remove ${s.stickerId} sticker`}
                 title="Click to remove"
               >

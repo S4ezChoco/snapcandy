@@ -9,9 +9,9 @@ interface LayoutCardProps {
   description: string;
 }
 
-/** Preview diagram dimensions (px) */
-const PREVIEW_WIDTH = 100;
-const PREVIEW_HEIGHT = 140;
+/** Preview diagram dimensions (rem) */
+const PREVIEW_WIDTH = '6.25rem';
+const PREVIEW_HEIGHT = '8.75rem';
 
 export default function LayoutCard({
   layout,
@@ -25,7 +25,7 @@ export default function LayoutCard({
     <GlassCard
       selected={selected}
       hovered={hovered}
-      className="transition-all duration-200"
+      className="transition-all duration-150"
     >
       <button
         type="button"
@@ -39,7 +39,7 @@ export default function LayoutCard({
         {/* Selection checkmark — inside card bounds */}
         {selected && (
           <span
-            className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-white text-[10px] font-bold shadow-md z-10"
+            className="absolute top-3 right-3 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-white text-[0.625rem] font-semibold shadow-sm z-10"
             aria-label="Selected"
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 13l4 4L19 7"/></svg>
@@ -48,7 +48,7 @@ export default function LayoutCard({
 
         {/* Visual preview diagram */}
         <div
-          className="relative rounded-lg overflow-hidden border border-white/10"
+          className="relative rounded-xl overflow-hidden border border-white/10"
           style={{ width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }}
           aria-hidden="true"
         >
@@ -81,7 +81,7 @@ export default function LayoutCard({
         </span>
 
         {/* Description */}
-        <span className="text-xs text-white/50">{description}</span>
+        <span className="text-xs text-white/60">{description}</span>
       </button>
     </GlassCard>
   );

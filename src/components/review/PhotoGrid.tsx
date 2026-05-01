@@ -15,12 +15,12 @@ export default function PhotoGrid({ photos, onRetake }: PhotoGridProps) {
         <div
           key={photo.id}
           data-testid={`photo-card-${index}`}
-          className="relative group rounded-xl border border-white/10 bg-white/5 overflow-hidden transition-all duration-200 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/10 hover:scale-[1.02] w-[220px]"
+          className="relative group rounded-xl border border-white/10 bg-white/5 overflow-hidden transition-all duration-150 hover:border-accent/40 hover:shadow-md hover:scale-[1.02] w-[13.75rem]"
         >
           {/* Number label */}
           <span
             data-testid={`photo-label-${index}`}
-            className="absolute top-2 left-2 z-10 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded-md"
+            className="absolute top-2 left-2 z-10 bg-black/60 text-white text-xs font-semibold px-2 py-1 rounded-lg"
           >
             #{index + 1}
           </span>
@@ -37,7 +37,7 @@ export default function PhotoGrid({ photos, onRetake }: PhotoGridProps) {
             type="button"
             data-testid={`retake-button-${index}`}
             onClick={() => onRetake(index)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-900 text-white text-xs font-semibold uppercase tracking-wider hover:bg-gray-800 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent/50"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white text-xs font-semibold uppercase tracking-wider hover:bg-gray-800 transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-accent/50"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

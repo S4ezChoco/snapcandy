@@ -52,7 +52,7 @@ export default function ThemeSelector() {
     >
       {/* Breadcrumb */}
       {storedLayout && (
-        <p className="text-xs text-white/40 mb-4 tracking-wide">
+        <p className="text-xs text-white/60 mb-4 tracking-wide">
           Layout &gt; <span className="text-white/60">{storedLayout.label}</span>
         </p>
       )}
@@ -65,7 +65,7 @@ export default function ThemeSelector() {
         Pick Your{' '}
         <span className="text-accent italic">Vibe</span>
       </h1>
-      <p className="text-white/50 text-sm md:text-base mb-10 text-center max-w-md">
+      <p className="text-white/60 text-sm md:text-base mb-10 text-center max-w-md">
         Choose a visual theme for your photo strip — or create your own.
       </p>
 
@@ -116,7 +116,7 @@ export default function ThemeSelector() {
             'rounded-full px-10 py-3 text-base font-semibold transition-all duration-200',
             'focus:outline-none focus:ring-2 focus:ring-accent/60 focus:ring-offset-2 focus:ring-offset-dark-teal',
             selectedId !== null
-              ? 'bg-accent text-white shadow-lg shadow-accent/30 hover:scale-105 hover:shadow-xl hover:shadow-accent/40 cursor-pointer'
+              ? 'bg-accent text-white shadow-md shadow-accent/30 hover:scale-105 hover:shadow-lg hover:shadow-accent/40 cursor-pointer'
               : 'bg-white/10 text-white/30 cursor-not-allowed',
           ].join(' ')}
         >

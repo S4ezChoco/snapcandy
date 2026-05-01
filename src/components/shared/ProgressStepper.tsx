@@ -20,7 +20,7 @@ export default function ProgressStepper({ currentStep }: ProgressStepperProps) {
     >
       <div className="max-w-2xl mx-auto">
         {/* Pill-shaped container */}
-        <div className="bg-gray-900/60 backdrop-blur-md border border-white/10 rounded-full px-4 py-2.5 flex items-center">
+        <div className="bg-gray-900/60 backdrop-blur-[12px] border border-white/10 rounded-full px-4 py-3 flex items-center">
           {STEP_LABELS.map((label, index) => {
             const stepNum = index + 1;
             const isCompleted = stepNum < currentStep;
@@ -29,14 +29,14 @@ export default function ProgressStepper({ currentStep }: ProgressStepperProps) {
             return (
               <div key={stepNum} className="flex items-center flex-1 last:flex-none">
                 {/* Step indicator */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
                   <div
                     data-testid={`step-indicator-${stepNum}`}
                     data-status={
                       isCompleted ? 'completed' : isActive ? 'active' : 'upcoming'
                     }
                     className={[
-                      'w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors duration-200',
+                      'w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors duration-150',
                       isCompleted
                         ? 'bg-accent text-dark-teal'
                         : isActive
@@ -77,7 +77,7 @@ export default function ProgressStepper({ currentStep }: ProgressStepperProps) {
                   <div
                     data-testid={`step-line-${stepNum}`}
                     className={[
-                      'flex-1 h-px mx-2 transition-colors duration-200',
+                      'flex-1 h-px mx-2 transition-colors duration-150',
                       isCompleted ? 'bg-accent' : 'bg-gray-700/60',
                     ].join(' ')}
                   />

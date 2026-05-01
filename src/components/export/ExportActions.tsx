@@ -1,10 +1,14 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePhotoboothStore } from '../../store/usePhotoboothStore';
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { exportAsJpg } from '../../renderer/exporters/jpgExporter';
 import { exportAsGif } from '../../renderer/exporters/gifExporter';
 import { downloadBlob } from '../../utils/download';
 import { shareOrCopy } from '../../utils/share';
+import { clearSession } from '../../hooks/useSessionPersistence';
+import ConfirmationDialog from '../shared/ConfirmationDialog';
+import RippleButton from '../shared/RippleButton';
 
 const DownloadIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -60,10 +64,12 @@ export default function ExportActions() {
   const capturedPhotos = usePhotoboothStore((s) => s.capturedPhotos);
   const customizations = usePhotoboothStore((s) => s.customizations);
   const resetAll = usePhotoboothStore((s) => s.resetAll);
+  const addToast = usePhotoboothStore((s) => s.addToast);
 
   const [isExporting, setIsExporting] = useState(false);
   const [exportType, setExportType] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [showNewStyleConfirm, setShowNewStyleConfirm] = useState(false);
 
   const handleExport = useCallback(
     async (type: 'jpg' | 'gif' | 'share') => {
@@ -85,6 +91,8 @@ export default function ExportActions() {
               customizations
             );
             downloadBlob(blob, 'snapcandy-strip.jpg');
+            clearSession();
+            addToast({ type: 'success', message: 'Saved!', duration: 3000 });
             break;
 
           case 'gif':
@@ -96,6 +104,8 @@ export default function ExportActions() {
               setProgress
             );
             downloadBlob(blob, 'snapcandy-strip.gif');
+            clearSession();
+            addToast({ type: 'success', message: 'Saved!', duration: 3000 });
             break;
 
           case 'share':
@@ -106,32 +116,46 @@ export default function ExportActions() {
               customizations
             );
             await shareOrCopy(blob, 'My SnapCandy Strip');
+            clearSession();
+            addToast({ type: 'success', message: 'Copied to clipboard!', duration: 3000 });
             break;
         }
       } catch (err) {
         console.error(`Export failed (${type}):`, err);
+        addToast({
+          type: 'error',
+          message: 'Export failed. Please try again.',
+          duration: 5000,
+          action: { label: 'Try Again', onClick: () => handleExport(type) },
+        });
       } finally {
         setIsExporting(false);
         setExportType(null);
         setProgress(0);
       }
     },
-    [selectedLayout, selectedTheme, capturedPhotos, customizations, isExporting]
+    [selectedLayout, selectedTheme, capturedPhotos, customizations, isExporting, addToast]
   );
+
+  const shortcuts = useMemo(() => ({
+    onSave: () => handleExport('jpg'),
+  }), [handleExport]);
+
+  useKeyboardShortcuts(shortcuts);
 
   return (
     <div className="flex flex-col gap-3 w-full" data-testid="export-actions">
       {/* Primary export */}
-      <button
+      <RippleButton
         type="button"
         onClick={() => handleExport('jpg')}
         disabled={isExporting}
-        className="w-full rounded-full px-6 py-3 text-sm font-semibold bg-accent text-white shadow-lg shadow-accent/30 hover:scale-[1.02] hover:shadow-xl hover:shadow-accent/40 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-accent/60 flex items-center justify-center gap-2"
+        className="w-full rounded-full px-6 py-3 text-sm font-semibold bg-accent text-white shadow-md shadow-accent/30 hover:scale-[1.02] hover:shadow-lg hover:shadow-accent/40 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-accent/60 flex items-center justify-center gap-2"
         data-testid="save-jpg-button"
       >
         <DownloadIcon />
         {isExporting && exportType === 'jpg' ? 'Saving...' : 'Save as JPG'}
-      </button>
+      </RippleButton>
 
       {/* GIF export */}
       <button
@@ -159,13 +183,30 @@ export default function ExportActions() {
         {isExporting && exportType === 'share' ? 'Sharing...' : 'Share'}
       </button>
 
-      {/* Progress bar for GIF */}
+      {/* Determinate progress bar with percentage text for GIF exports */}
       {isExporting && exportType === 'gif' && (
-        <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden" data-testid="export-progress">
-          <div
-            className="h-full bg-accent rounded-full transition-all duration-300 ease-out"
-            style={{ width: `${progress}%` }}
-          />
+        <div className="w-full flex flex-col gap-1" data-testid="export-progress">
+          <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+            <div
+              className="h-full bg-accent rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-xs text-white/60 text-center" data-testid="export-progress-text">
+            Creating GIF... {progress}%
+          </p>
+        </div>
+      )}
+
+      {/* Indeterminate shimmer progress bar for JPG exports */}
+      {isExporting && (exportType === 'jpg' || exportType === 'share') && (
+        <div className="w-full flex flex-col gap-1" data-testid="export-progress-jpg">
+          <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+            <div className="h-full w-1/3 bg-accent/70 rounded-full animate-shimmer" />
+          </div>
+          <p className="text-xs text-white/60 text-center" data-testid="export-progress-text-jpg">
+            {exportType === 'share' ? 'Preparing to share...' : 'Rendering JPG...'}
+          </p>
         </div>
       )}
 
@@ -177,7 +218,7 @@ export default function ExportActions() {
         type="button"
         onClick={() => navigate('/capture')}
         disabled={isExporting}
-        className="w-full rounded-full px-6 py-2.5 text-sm font-semibold text-white/70 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-accent/50 flex items-center justify-center gap-2"
+        className="w-full rounded-full px-6 py-3 text-sm font-semibold text-white/70 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-accent/50 flex items-center justify-center gap-2"
         data-testid="retake-button"
       >
         <CameraIcon />
@@ -186,14 +227,30 @@ export default function ExportActions() {
 
       <button
         type="button"
-        onClick={() => { resetAll(); navigate('/layout'); }}
+        onClick={() => setShowNewStyleConfirm(true)}
         disabled={isExporting}
-        className="w-full rounded-full px-6 py-2.5 text-sm font-semibold text-white/70 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-accent/50 flex items-center justify-center gap-2"
+        className="w-full rounded-full px-6 py-3 text-sm font-semibold text-white/70 bg-white/5 border border-white/10 hover:bg-white/10 hover:text-white transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-accent/50 flex items-center justify-center gap-2"
         data-testid="new-style-button"
       >
         <PaletteIcon />
         New Style
       </button>
+
+      {/* Confirmation dialog for New Style */}
+      <ConfirmationDialog
+        open={showNewStyleConfirm}
+        title="Start New Style?"
+        message="This will reset all your selections and customizations. Your current work will be lost."
+        confirmLabel="Start Fresh"
+        variant="danger"
+        onConfirm={() => {
+          setShowNewStyleConfirm(false);
+          clearSession();
+          resetAll();
+          navigate('/layout');
+        }}
+        onCancel={() => setShowNewStyleConfirm(false)}
+      />
     </div>
   );
 }

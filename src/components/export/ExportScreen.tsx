@@ -41,7 +41,7 @@ export default function ExportScreen() {
   return (
     <div
       data-testid="export-screen"
-      className="flex flex-col h-[calc(100vh-80px)] max-w-5xl mx-auto animate-fade-slide-in"
+      className="flex flex-col h-[calc(100vh-5rem)] max-w-5xl mx-auto animate-fade-slide-in"
     >
       {/* Header */}
       <div className="text-center px-6 pt-4 pb-2 shrink-0">
@@ -69,7 +69,7 @@ export default function ExportScreen() {
         >
           <canvas
             ref={canvasRef}
-            className="rounded-lg shadow-2xl shadow-black/40"
+            className="rounded-xl shadow-xl"
             style={{
               width: displayStyle.width,
               height: displayStyle.height,

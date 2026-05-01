@@ -19,10 +19,23 @@ const FILTER_OPTIONS: FilterOption[] = [
 export default function FilterPanel() {
   const customizations = usePhotoboothStore((s) => s.customizations);
   const updateCustomizations = usePhotoboothStore((s) => s.updateCustomizations);
+  const setPreviewFilter = usePhotoboothStore((s) => s.setPreviewFilter);
 
   const activeFilter = customizations.filter;
 
-  const selectFilter = (filter: FilterType | null) => {
+  const handleMouseEnter = (filter: FilterType | null) => {
+    // Only show preview if hovering over a different filter than the committed one
+    setPreviewFilter(filter);
+  };
+
+  const handleMouseLeave = () => {
+    // Revert preview to committed filter
+    setPreviewFilter(undefined);
+  };
+
+  const handleClick = (filter: FilterType | null) => {
+    // Commit the filter to the store and clear preview
+    setPreviewFilter(undefined);
     updateCustomizations({ filter });
   };
 
@@ -35,8 +48,10 @@ export default function FilterPanel() {
             <button
               key={label}
               type="button"
-              onClick={() => selectFilter(type)}
-              className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-lg border transition-all cursor-pointer ${
+              onClick={() => handleClick(type)}
+              onMouseEnter={() => handleMouseEnter(type)}
+              onMouseLeave={handleMouseLeave}
+              className={`flex flex-col items-center gap-2 py-3 px-2 rounded-xl border transition-all duration-150 cursor-pointer ${
                 isActive
                   ? 'bg-accent/20 border-accent/50 text-accent'
                   : 'bg-white/[0.03] border-white/10 text-white/60 hover:bg-white/10'

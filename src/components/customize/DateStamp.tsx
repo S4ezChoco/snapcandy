@@ -38,7 +38,7 @@ export default function DateStamp() {
         <button
           type="button"
           onClick={toggleDateStamp}
-          className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${
+          className={`relative w-12 h-6 rounded-full transition-colors duration-150 cursor-pointer ${
             isEnabled ? 'bg-accent' : 'bg-white/10'
           }`}
           role="switch"
@@ -55,7 +55,7 @@ export default function DateStamp() {
 
       {/* Preview */}
       {isEnabled && (
-        <div className="flex items-center justify-center py-3 rounded-lg bg-white/5 border border-white/10">
+        <div className="flex items-center justify-center py-3 rounded-xl bg-white/5 border border-white/10">
           <span className="text-sm text-white/70" data-testid="date-stamp-preview">
             {customizations.dateStamp?.format}
           </span>

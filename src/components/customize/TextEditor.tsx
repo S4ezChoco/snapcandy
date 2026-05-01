@@ -10,6 +10,7 @@ const FONT_OPTIONS = [
 export default function TextEditor() {
   const customizations = usePhotoboothStore((s) => s.customizations);
   const updateCustomizations = usePhotoboothStore((s) => s.updateCustomizations);
+  const addToast = usePhotoboothStore((s) => s.addToast);
 
   const [text, setText] = useState('');
   const [fontFamily, setFontFamily] = useState(FONT_OPTIONS[0].value);
@@ -34,6 +35,7 @@ export default function TextEditor() {
       textOverlays: [...customizations.textOverlays, newOverlay],
     });
     setText('');
+    addToast({ type: 'info', message: 'Text added', duration: 2000 });
   };
 
   const removeText = (id: string) => {
@@ -66,7 +68,7 @@ export default function TextEditor() {
               key={font.value}
               type="button"
               onClick={() => setFontFamily(font.value)}
-              className={`flex-1 py-2 text-sm rounded-lg border transition-all cursor-pointer ${
+              className={`flex-1 py-2 text-sm rounded-xl border transition-all duration-150 cursor-pointer ${
                 fontFamily === font.value
                   ? 'bg-accent/20 border-accent/50 text-accent'
                   : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
@@ -107,7 +109,7 @@ export default function TextEditor() {
             className="w-10 h-10 rounded-lg border border-white/10 cursor-pointer bg-transparent"
             data-testid="text-color-picker"
           />
-          <span className="text-sm text-white/50 font-mono">{color}</span>
+          <span className="text-sm text-white/60 font-mono">{color}</span>
         </div>
       </div>
 
@@ -116,7 +118,7 @@ export default function TextEditor() {
         type="button"
         onClick={addText}
         disabled={!text.trim()}
-        className="w-full py-2.5 rounded-lg bg-accent text-white font-semibold text-sm hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+        className="w-full py-3 rounded-xl bg-accent text-white font-semibold text-sm hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 cursor-pointer"
         data-testid="add-text-button"
       >
         Add Text
@@ -125,14 +127,14 @@ export default function TextEditor() {
       {/* Active text overlays */}
       {customizations.textOverlays.length > 0 && (
         <div>
-          <p className="text-xs text-white/50 mb-2">
+          <p className="text-xs text-white/60 mb-2">
             Active ({customizations.textOverlays.length})
           </p>
           <div className="space-y-1">
             {customizations.textOverlays.map((t) => (
               <div
                 key={t.id}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 border border-white/10"
+                className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 border border-white/10"
               >
                 <span className="text-sm text-white/70 truncate mr-2" style={{ fontFamily: t.fontFamily }}>
                   {t.text}
@@ -140,7 +142,7 @@ export default function TextEditor() {
                 <button
                   type="button"
                   onClick={() => removeText(t.id)}
-                  className="text-xs text-red-400 hover:text-red-300 cursor-pointer shrink-0"
+                  className="text-xs text-red-400 hover:text-red-300 transition-colors duration-150 cursor-pointer shrink-0"
                   aria-label={`Remove text: ${t.text}`}
                 >
                   ✕

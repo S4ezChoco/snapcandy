@@ -23,10 +23,10 @@ export default function CaptureControls({
           data-testid="mode-manual"
           onClick={() => onSettingsChange({ mode: 'manual' })}
           className={[
-            'px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200',
+            'px-4 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer',
             settings.mode === 'manual'
               ? 'bg-accent text-white shadow-sm'
-              : 'text-white/50 hover:text-white/80',
+              : 'text-white/60 hover:text-white/80 hover:bg-white/5',
           ].join(' ')}
         >
           Manual
@@ -36,10 +36,10 @@ export default function CaptureControls({
           data-testid="mode-auto"
           onClick={() => onSettingsChange({ mode: 'auto' })}
           className={[
-            'px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200',
+            'px-4 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer',
             settings.mode === 'auto'
               ? 'bg-accent text-white shadow-sm'
-              : 'text-white/50 hover:text-white/80',
+              : 'text-white/60 hover:text-white/80 hover:bg-white/5',
           ].join(' ')}
         >
           Auto
@@ -55,10 +55,10 @@ export default function CaptureControls({
             data-testid={`timer-${sec}s`}
             onClick={() => onSettingsChange({ timerSeconds: sec })}
             className={[
-              'px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200',
+              'px-3 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer',
               settings.timerSeconds === sec
                 ? 'bg-accent text-white shadow-sm'
-                : 'text-white/50 hover:text-white/80',
+                : 'text-white/60 hover:text-white/80 hover:bg-white/5',
             ].join(' ')}
           >
             {sec}s
@@ -73,10 +73,10 @@ export default function CaptureControls({
           data-testid="quality-balanced"
           onClick={() => onSettingsChange({ quality: 'balanced' })}
           className={[
-            'px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200',
+            'px-3 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer',
             settings.quality === 'balanced'
               ? 'bg-accent text-white shadow-sm'
-              : 'text-white/50 hover:text-white/80',
+              : 'text-white/60 hover:text-white/80 hover:bg-white/5',
           ].join(' ')}
         >
           Bal
@@ -86,10 +86,10 @@ export default function CaptureControls({
           data-testid="quality-high"
           onClick={() => onSettingsChange({ quality: 'high' })}
           className={[
-            'px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200',
+            'px-3 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer',
             settings.quality === 'high'
               ? 'bg-accent text-white shadow-sm'
-              : 'text-white/50 hover:text-white/80',
+              : 'text-white/60 hover:text-white/80 hover:bg-white/5',
           ].join(' ')}
         >
           HQ
@@ -103,10 +103,10 @@ export default function CaptureControls({
         onClick={() => onSettingsChange({ mirrored: !settings.mirrored })}
         aria-label="Toggle mirror"
         className={[
-          'w-9 h-9 rounded-full flex items-center justify-center text-sm transition-all duration-200 border',
+          'w-9 h-9 rounded-full flex items-center justify-center text-sm transition-all duration-150 border cursor-pointer',
           settings.mirrored
             ? 'bg-accent/20 border-accent/40 text-accent'
-            : 'bg-white/5 border-white/10 text-white/50 hover:text-white/80',
+            : 'bg-white/5 border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10',
         ].join(' ')}
       >
         ↔
@@ -119,10 +119,10 @@ export default function CaptureControls({
         onClick={() => onSettingsChange({ fullscreen: !settings.fullscreen })}
         aria-label="Toggle fullscreen"
         className={[
-          'w-9 h-9 rounded-full flex items-center justify-center text-sm transition-all duration-200 border',
+          'w-9 h-9 rounded-full flex items-center justify-center text-sm transition-all duration-150 border cursor-pointer',
           settings.fullscreen
             ? 'bg-accent/20 border-accent/40 text-accent'
-            : 'bg-white/5 border-white/10 text-white/50 hover:text-white/80',
+            : 'bg-white/5 border-white/10 text-white/60 hover:text-white/80 hover:bg-white/10',
         ].join(' ')}
       >
         ⛶

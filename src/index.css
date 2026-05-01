@@ -32,7 +32,7 @@ body {
 /* Smooth page transitions */
 .page-enter {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(0.75rem);
 }
 
 .page-enter-active {
@@ -48,7 +48,7 @@ body {
 
 .page-exit-active {
   opacity: 0;
-  transform: translateY(-12px);
+  transform: translateY(-0.75rem);
   transition: opacity 200ms ease-in, transform 200ms ease-in;
 }
 
@@ -56,7 +56,7 @@ body {
 @keyframes fadeSlideIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(0.625rem);
   }
   to {
     opacity: 1;
@@ -66,6 +66,133 @@ body {
 
 .animate-fade-slide-in {
   animation: fadeSlideIn 0.4s ease-out both;
+}
+
+/* Toast enter animation: slide up + fade in (200ms) */
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Toast exit animation: fade out + slide down (150ms) */
+@keyframes toastExit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+.animate-toast-enter {
+  animation: toastEnter 200ms ease-out both;
+}
+
+.animate-toast-exit {
+  animation: toastExit 150ms ease-in both;
+}
+
+/* Panel slide-in from right: 200ms ease-out */
+@keyframes panelSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Panel slide-out to right: 150ms ease-in */
+@keyframes panelSlideOut {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.animate-panel-slide-in {
+  animation: panelSlideIn 200ms ease-out both;
+}
+
+.animate-panel-slide-out {
+  animation: panelSlideOut 150ms ease-in both;
+}
+
+/* Thumbnail bounce animation: scale 0 → 1.1 → 1.0 over 300ms */
+@keyframes thumbnailBounce {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-thumbnail-bounce {
+  animation: thumbnailBounce 300ms ease-out both;
+}
+
+/* Ripple effect animation: scale 0→2, opacity 0.3→0 over 400ms */
+@keyframes ripple {
+  from {
+    width: 7.5rem;
+    height: 7.5rem;
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    width: 7.5rem;
+    height: 7.5rem;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+/* Sticker pop-in animation: scale(0) → scale(1) over 200ms */
+@keyframes stickerPopIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-sticker-pop-in {
+  animation: stickerPopIn 200ms ease-out both;
+}
+
+/* Indeterminate shimmer animation for progress bars */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Global focus-visible ring for keyboard navigation (Requirements 6.1, 6.2) */
+:focus-visible {
+  outline: 2px solid rgba(244, 162, 97, 0.6);
+  outline-offset: 2px;
 }
 
 /* Custom scrollbar (dark theme) */
@@ -117,7 +244,7 @@ body {
     font-size: 1.125rem;
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.8);
-    max-width: 320px;
+    max-width: 20rem;
   }
 
   .small-viewport-message .icon {

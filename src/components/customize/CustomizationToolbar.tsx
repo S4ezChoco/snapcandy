@@ -111,7 +111,7 @@ export default function CustomizationToolbar() {
       {/* Active panel */}
       {ActivePanel && (
         <div
-          className="mx-4 mb-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md max-h-64 overflow-y-auto"
+          className="mx-4 mb-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-[12px] max-h-64 overflow-y-auto"
           data-testid={`panel-${activeTool}`}
         >
           <ActivePanel />
@@ -119,7 +119,7 @@ export default function CustomizationToolbar() {
       )}
 
       {/* Tool buttons bar */}
-      <div className="flex items-center justify-center gap-0.5 px-2 py-2 bg-black/30 backdrop-blur-md border-t border-white/10">
+      <div className="flex items-center justify-center gap-1 px-2 py-2 bg-black/30 backdrop-blur-[12px] border-t border-white/10">
         {TOOLS.map((tool) => {
           const isActive = activeTool === tool.id;
           return (
@@ -127,7 +127,7 @@ export default function CustomizationToolbar() {
               key={tool.id}
               type="button"
               onClick={() => toggleTool(tool.id)}
-              className={`flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-md transition-all cursor-pointer min-w-[48px] ${
+              className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all duration-150 cursor-pointer min-w-[3rem] ${
                 isActive
                   ? 'bg-accent/20 text-accent'
                   : 'text-white/60 hover:bg-white/5 hover:text-white/80'
@@ -136,7 +136,7 @@ export default function CustomizationToolbar() {
               aria-pressed={isActive}
             >
               <span className="flex items-center justify-center">{tool.icon}</span>
-              <span className="text-[9px] font-medium leading-tight">{tool.label}</span>
+              <span className="text-[0.5625rem] font-medium leading-tight">{tool.label}</span>
             </button>
           );
         })}

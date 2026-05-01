@@ -58,7 +58,7 @@ export default function ShapePanel() {
             className="w-10 h-10 rounded-lg border border-white/10 cursor-pointer bg-transparent"
             data-testid="border-color-picker"
           />
-          <span className="text-sm text-white/50 font-mono">{shape.borderColor}</span>
+          <span className="text-sm text-white/60 font-mono">{shape.borderColor}</span>
         </div>
       </div>
     </div>

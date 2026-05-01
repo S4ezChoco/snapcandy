@@ -47,7 +47,7 @@ export default function LayoutSelector() {
         Choose Your{' '}
         <span className="text-accent italic">Layout</span>
       </h1>
-      <p className="text-white/50 text-sm md:text-base mb-10 text-center max-w-md">
+      <p className="text-white/60 text-sm md:text-base mb-10 text-center max-w-md">
         Pick how your photos will be arranged on the final strip.
       </p>
 
@@ -78,7 +78,7 @@ export default function LayoutSelector() {
           'mt-10 rounded-full px-10 py-3 text-base font-semibold transition-all duration-200',
           'focus:outline-none focus:ring-2 focus:ring-accent/60 focus:ring-offset-2 focus:ring-offset-dark-teal',
           selectedType !== null
-            ? 'bg-accent text-white shadow-lg shadow-accent/30 hover:scale-105 hover:shadow-xl hover:shadow-accent/40 cursor-pointer'
+            ? 'bg-accent text-white shadow-md shadow-accent/30 hover:scale-105 hover:shadow-lg hover:shadow-accent/40 cursor-pointer'
             : 'bg-white/10 text-white/30 cursor-not-allowed',
         ].join(' ')}
       >

@@ -11,16 +11,16 @@ export default function PhotoThumbnails({ photos, totalSlots }: PhotoThumbnailsP
   return (
     <div
       data-testid="photo-thumbnails"
-      className="flex flex-col gap-3 w-24"
+      className="flex flex-row lg:flex-col gap-3 lg:w-24"
     >
       {slots.map((photo, index) => (
         <div
           key={photo?.id ?? `slot-${index}`}
           data-testid={`thumbnail-slot-${index}`}
           className={[
-            'w-24 h-18 rounded-lg border overflow-hidden flex items-center justify-center transition-all duration-200',
+            'w-24 h-18 rounded-xl border overflow-hidden flex items-center justify-center transition-all duration-200',
             photo
-              ? 'border-accent/40 bg-black/30'
+              ? 'border-accent/40 bg-black/30 animate-thumbnail-bounce'
               : 'border-white/10 bg-white/5',
           ].join(' ')}
         >

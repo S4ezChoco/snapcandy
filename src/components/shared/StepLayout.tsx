@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
+import PageTransition from './PageTransition';
 import ProgressStepper from './ProgressStepper';
 
 interface StepLayoutProps {
@@ -24,8 +25,10 @@ export default function StepLayout({ children }: StepLayoutProps) {
       <ProgressStepper currentStep={currentStep} />
 
       {/* Step content area */}
-      <div className="flex-1 animate-fade-slide-in">
-        {children}
+      <div className="flex-1">
+        <PageTransition key={location.pathname}>
+          {children}
+        </PageTransition>
       </div>
     </div>
   );

@@ -45,7 +45,7 @@ export default function ThemeCard({ theme, selected, onClick }: ThemeCardProps) 
     <GlassCard
       selected={selected}
       hovered={hovered}
-      className="transition-all duration-200"
+      className="transition-all duration-150"
     >
       <button
         type="button"
@@ -57,15 +57,15 @@ export default function ThemeCard({ theme, selected, onClick }: ThemeCardProps) 
         aria-pressed={selected}
       >
         {/* Tag badge — top-right corner */}
-        <span className="absolute top-3 right-3 flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-sm px-2.5 py-0.5 text-[10px] font-semibold text-white/80 tracking-wide z-10">
+        <span className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/10 backdrop-blur-sm px-3 py-1 text-[0.625rem] font-semibold text-white/80 tracking-wide z-10">
           <span className={`inline-block h-1.5 w-1.5 rounded-full ${dotColor}`} />
           {theme.tag}
         </span>
 
         {/* Visual preview */}
         <div
-          className="relative w-full rounded-lg overflow-hidden border border-white/10"
-          style={{ height: 120, background: preview.background }}
+          className="relative w-full rounded-xl overflow-hidden border border-white/10"
+          style={{ height: '7.5rem', background: preview.background }}
           aria-hidden="true"
         >
           {/* Decoration hints */}
