@@ -177,7 +177,96 @@ function drawSparkle(
 }
 
 /**
- * Draws all theme decoration elements (stars, petals, sparkles) onto the canvas.
+ * Draws a heart shape at the given center position.
+ */
+function drawHeart(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  color: string,
+  opacity: number
+): void {
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+
+  const s = size * 0.6;
+  const topY = cy - s * 0.4;
+
+  ctx.moveTo(cx, cy + s);
+  ctx.bezierCurveTo(cx - s * 1.5, cy - s * 0.2, cx - s * 0.8, topY - s, cx, topY);
+  ctx.bezierCurveTo(cx + s * 0.8, topY - s, cx + s * 1.5, cy - s * 0.2, cx, cy + s);
+
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/**
+ * Draws a geometric diamond/rhombus shape at the given center position.
+ */
+function drawGeometric(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  color: string,
+  opacity: number
+): void {
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+
+  // Draw a diamond
+  ctx.moveTo(cx, cy - size);
+  ctx.lineTo(cx + size, cy);
+  ctx.lineTo(cx, cy + size);
+  ctx.lineTo(cx - size, cy);
+  ctx.closePath();
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * Draws a border-pattern element (small decorative corner/edge mark).
+ */
+function drawBorderPattern(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  color: string,
+  opacity: number
+): void {
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+
+  // Draw a small L-shaped corner mark
+  const half = size / 2;
+  ctx.beginPath();
+  ctx.moveTo(cx - half, cy);
+  ctx.lineTo(cx - half, cy - half);
+  ctx.lineTo(cx, cy - half);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(cx, cy + half);
+  ctx.lineTo(cx + half, cy + half);
+  ctx.lineTo(cx + half, cy);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * Draws all theme decoration elements (stars, petals, sparkles, hearts, geometric, border-pattern) onto the canvas.
  */
 export function drawThemeDecorations(
   ctx: CanvasRenderingContext2D,
@@ -201,7 +290,15 @@ export function drawThemeDecorations(
       case 'sparkle':
         drawSparkle(ctx, cx, cy, decoration.size, color, decoration.opacity);
         break;
-      // 'border-pattern' can be extended later
+      case 'heart':
+        drawHeart(ctx, cx, cy, decoration.size, color, decoration.opacity);
+        break;
+      case 'geometric':
+        drawGeometric(ctx, cx, cy, decoration.size, color, decoration.opacity);
+        break;
+      case 'border-pattern':
+        drawBorderPattern(ctx, cx, cy, decoration.size, color, decoration.opacity);
+        break;
     }
   }
 }

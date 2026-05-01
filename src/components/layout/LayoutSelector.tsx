@@ -12,6 +12,13 @@ const LAYOUT_DESCRIPTIONS: Record<LayoutType, string> = {
   polaroid: '1 photo · large print',
   '2x2-grid': '4 photos · square grid',
   '4x6-layout': '6 photos · standard print',
+  'filmstrip-horizontal': '3 photos · side-by-side',
+  'asymmetric-1-plus-3': '4 photos · 1 large + 3 small',
+  'collage-mosaic': '5 photos · varied sizes',
+  'panoramic-strip': '2 photos · cinematic wide',
+  'polaroid-stack': '3 photos · stacked frames',
+  'triple-tall': '3 photos · narrow vertical',
+  'big-small-big': '3 photos · center smaller',
 };
 
 export default function LayoutSelector() {

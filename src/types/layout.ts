@@ -1,4 +1,16 @@
-export type LayoutType = 'classic-strip' | 'tall-strip' | 'polaroid' | '2x2-grid' | '4x6-layout';
+export type LayoutType =
+  | 'classic-strip'
+  | 'tall-strip'
+  | 'polaroid'
+  | '2x2-grid'
+  | '4x6-layout'
+  | 'filmstrip-horizontal'
+  | 'asymmetric-1-plus-3'
+  | 'collage-mosaic'
+  | 'panoramic-strip'
+  | 'polaroid-stack'
+  | 'triple-tall'
+  | 'big-small-big';
 
 export interface PhotoPosition {
   x: number;      // normalized x (0-1)

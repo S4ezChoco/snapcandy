@@ -21,9 +21,19 @@ export interface TextOverlay {
 }
 
 export interface ImageAdjustments {
-  brightness: number; // -100 to 100, default 0
-  contrast: number;   // -100 to 100, default 0
-  saturation: number; // -100 to 100, default 0
+  brightness: number;    // -100 to 100, default 0
+  contrast: number;      // -100 to 100, default 0
+  saturation: number;    // -100 to 100, default 0
+  exposure: number;      // -100 to 100, default 0
+  temperature: number;   // -100 to 100, default 0
+  tint: number;          // -100 to 100, default 0
+  highlights: number;    // -100 to 100, default 0
+  shadows: number;       // -100 to 100, default 0
+  sharpness: number;     // 0 to 100, default 0
+  vignette: number;      // 0 to 100, default 0
+  grain: number;         // 0 to 100, default 0
+  blur: number;          // 0 to 100, default 0
+  fade: number;          // 0 to 100, default 0
 }
 
 export interface DateStampConfig {

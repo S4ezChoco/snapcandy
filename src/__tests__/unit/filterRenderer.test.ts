@@ -6,6 +6,16 @@ const zeroAdjustments: ImageAdjustments = {
   brightness: 0,
   contrast: 0,
   saturation: 0,
+  exposure: 0,
+  temperature: 0,
+  tint: 0,
+  highlights: 0,
+  shadows: 0,
+  sharpness: 0,
+  vignette: 0,
+  grain: 0,
+  blur: 0,
+  fade: 0,
 };
 
 describe('getFilterString', () => {
@@ -42,22 +52,22 @@ describe('getFilterString', () => {
   });
 
   it('applies brightness adjustment', () => {
-    const adj: ImageAdjustments = { brightness: 50, contrast: 0, saturation: 0 };
+    const adj: ImageAdjustments = { ...zeroAdjustments, brightness: 50 };
     expect(getFilterString(null, adj)).toBe('brightness(150%)');
   });
 
   it('applies contrast adjustment', () => {
-    const adj: ImageAdjustments = { brightness: 0, contrast: -30, saturation: 0 };
+    const adj: ImageAdjustments = { ...zeroAdjustments, contrast: -30 };
     expect(getFilterString(null, adj)).toBe('contrast(70%)');
   });
 
   it('applies saturation adjustment', () => {
-    const adj: ImageAdjustments = { brightness: 0, contrast: 0, saturation: 100 };
+    const adj: ImageAdjustments = { ...zeroAdjustments, saturation: 100 };
     expect(getFilterString(null, adj)).toBe('saturate(200%)');
   });
 
   it('combines filter with adjustments', () => {
-    const adj: ImageAdjustments = { brightness: 20, contrast: 0, saturation: 0 };
+    const adj: ImageAdjustments = { ...zeroAdjustments, brightness: 20 };
     const result = getFilterString('grayscale', adj);
     expect(result).toContain('grayscale(100%)');
     expect(result).toContain('brightness(120%)');

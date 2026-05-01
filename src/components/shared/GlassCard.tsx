@@ -21,7 +21,7 @@ export default function GlassCard({
         selected
           ? 'bg-white/10 border-accent/60 shadow-md shadow-accent/10'
           : hovered
-            ? 'bg-white/8 border-white/20 scale-[1.02]'
+            ? 'bg-white/8 border-white/20'
             : 'bg-white/5 border-white/10',
         className,
       ]

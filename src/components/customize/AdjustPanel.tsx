@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { usePhotoboothStore } from '../../store/usePhotoboothStore';
+import type { ImageAdjustments } from '../../types/customization';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
 
 const SunIcon = () => (
@@ -25,10 +26,45 @@ const DropletIcon = () => (
   </svg>
 );
 
-const SLIDERS = [
-  { key: 'brightness' as const, label: 'Brightness', icon: <SunIcon /> },
-  { key: 'contrast' as const, label: 'Contrast', icon: <ContrastIcon /> },
-  { key: 'saturation' as const, label: 'Saturation', icon: <DropletIcon /> },
+type AdjustmentKey = keyof ImageAdjustments;
+
+type SliderConfig = {
+  key: AdjustmentKey;
+  label: string;
+  icon?: JSX.Element;
+  min: number;
+  max: number;
+};
+
+const GROUPS: Array<{ title: string; sliders: SliderConfig[] }> = [
+  {
+    title: 'Light',
+    sliders: [
+      { key: 'exposure', label: 'Exposure', icon: <SunIcon />, min: -100, max: 100 },
+      { key: 'brightness', label: 'Brightness', icon: <SunIcon />, min: -100, max: 100 },
+      { key: 'contrast', label: 'Contrast', icon: <ContrastIcon />, min: -100, max: 100 },
+      { key: 'highlights', label: 'Highlights', icon: <SunIcon />, min: -100, max: 100 },
+      { key: 'shadows', label: 'Shadows', icon: <ContrastIcon />, min: -100, max: 100 },
+    ],
+  },
+  {
+    title: 'Color',
+    sliders: [
+      { key: 'saturation', label: 'Saturation', icon: <DropletIcon />, min: -100, max: 100 },
+      { key: 'temperature', label: 'Temperature', icon: <DropletIcon />, min: -100, max: 100 },
+      { key: 'tint', label: 'Tint', icon: <DropletIcon />, min: -100, max: 100 },
+    ],
+  },
+  {
+    title: 'Effects',
+    sliders: [
+      { key: 'sharpness', label: 'Sharpness', min: 0, max: 100 },
+      { key: 'vignette', label: 'Vignette', min: 0, max: 100 },
+      { key: 'grain', label: 'Grain', min: 0, max: 100 },
+      { key: 'blur', label: 'Blur', min: 0, max: 100 },
+      { key: 'fade', label: 'Fade', min: 0, max: 100 },
+    ],
+  },
 ];
 
 export default function AdjustPanel() {
@@ -38,7 +74,7 @@ export default function AdjustPanel() {
 
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  const updateAdjustment = (key: keyof typeof adjustments, value: number) => {
+  const updateAdjustment = (key: AdjustmentKey, value: number) => {
     updateCustomizations({
       adjustments: { ...adjustments, [key]: value },
     });
@@ -46,50 +82,74 @@ export default function AdjustPanel() {
 
   const resetAll = () => {
     updateCustomizations({
-      adjustments: { brightness: 0, contrast: 0, saturation: 0 },
+      adjustments: {
+        brightness: 0,
+        contrast: 0,
+        saturation: 0,
+        exposure: 0,
+        temperature: 0,
+        tint: 0,
+        highlights: 0,
+        shadows: 0,
+        sharpness: 0,
+        vignette: 0,
+        grain: 0,
+        blur: 0,
+        fade: 0,
+      },
     });
   };
 
   return (
     <div className="p-4 space-y-3" data-testid="adjust-panel">
-      {SLIDERS.map(({ key, label, icon }) => {
-        const val = adjustments[key];
-        const pct = ((val + 100) / 200) * 100;
-        return (
-          <div key={key} className="space-y-2">
-            <label className="flex items-center justify-between text-sm text-white/70">
-              <span className="flex items-center gap-2">
-                <span className="text-white/60">{icon}</span>
-                {label}
-              </span>
-              <span className="text-xs font-mono text-accent tabular-nums w-10 text-right">{val}</span>
-            </label>
-            <div className="relative h-6 flex items-center">
-              <div className="absolute inset-x-0 h-1.5 rounded-full bg-white/10" />
-              <div
-                className="absolute h-1.5 rounded-full bg-accent/60"
-                style={{
-                  left: `${Math.min(pct, 50)}%`,
-                  width: `${Math.abs(pct - 50)}%`,
-                }}
-              />
-              <input
-                type="range"
-                min={-100}
-                max={100}
-                value={val}
-                onChange={(e) => updateAdjustment(key, Number(e.target.value))}
-                className="absolute inset-x-0 w-full h-6 opacity-0 cursor-pointer"
-                data-testid={`${key}-slider`}
-              />
-              <div
-                className="absolute w-3.5 h-3.5 rounded-full bg-accent border-2 border-white shadow-sm pointer-events-none"
-                style={{ left: `calc(${pct}% - 0.4375rem)` }}
-              />
-            </div>
+      {GROUPS.map((group) => (
+        <div key={group.title} className="space-y-3">
+          <div className="text-[11px] uppercase tracking-wide text-white/40">
+            {group.title}
           </div>
-        );
-      })}
+
+          {group.sliders.map(({ key, label, icon, min, max }) => {
+            const val = (adjustments[key] ?? 0) as number;
+            const valuePct = ((val - min) / (max - min)) * 100;
+            const zeroPctRaw = ((0 - min) / (max - min)) * 100;
+            const zeroPct = Math.max(0, Math.min(100, zeroPctRaw));
+            const left = Math.min(valuePct, zeroPct);
+            const width = Math.abs(valuePct - zeroPct);
+
+            return (
+              <div key={key} className="space-y-2">
+                <label className="flex items-center justify-between text-sm text-white/70">
+                  <span className="flex items-center gap-2">
+                    {icon && <span className="text-white/60">{icon}</span>}
+                    {label}
+                  </span>
+                  <span className="text-xs font-mono text-accent tabular-nums w-10 text-right">{val}</span>
+                </label>
+                <div className="relative h-6 flex items-center">
+                  <div className="absolute inset-x-0 h-1.5 rounded-full bg-white/10" />
+                  <div
+                    className="absolute h-1.5 rounded-full bg-accent/60"
+                    style={{ left: `${left}%`, width: `${width}%` }}
+                  />
+                  <input
+                    type="range"
+                    min={min}
+                    max={max}
+                    value={val}
+                    onChange={(e) => updateAdjustment(key, Number(e.target.value))}
+                    className="absolute inset-x-0 w-full h-6 opacity-0 cursor-pointer"
+                    data-testid={`${key}-slider`}
+                  />
+                  <div
+                    className="absolute w-3.5 h-3.5 rounded-full bg-accent border-2 border-white shadow-sm pointer-events-none"
+                    style={{ left: `calc(${valuePct}% - 0.4375rem)` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
 
       <button
         type="button"
@@ -103,7 +163,7 @@ export default function AdjustPanel() {
       <ConfirmationDialog
         open={showResetConfirm}
         title="Reset All Adjustments?"
-        message="This will reset brightness, contrast, and saturation to their default values."
+        message="This will reset all adjustment sliders to their default values."
         confirmLabel="Reset"
         variant="default"
         onConfirm={() => {

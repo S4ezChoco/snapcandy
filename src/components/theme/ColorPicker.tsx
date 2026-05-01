@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
+import type { CustomStudioConfig } from '../../types/theme';
 
 interface ColorPickerProps {
-  background: string;
-  accent: string;
-  onChange: (colors: { background: string; accent: string }) => void;
+  config: CustomStudioConfig;
+  onChange: (config: CustomStudioConfig) => void;
 }
 
 interface ColorFieldProps {
@@ -127,22 +127,105 @@ function ColorField({ label, value, onChange }: ColorFieldProps) {
   );
 }
 
-export default function ColorPicker({ background, accent, onChange }: ColorPickerProps) {
+const DECORATION_OPTIONS: { key: keyof CustomStudioConfig['decorations']; label: string; icon: string }[] = [
+  { key: 'stars', label: 'Stars', icon: '★' },
+  { key: 'sparkles', label: 'Sparkles', icon: '✦' },
+  { key: 'petals', label: 'Petals', icon: '❀' },
+  { key: 'hearts', label: 'Hearts', icon: '♥' },
+  { key: 'geometric', label: 'Geometric', icon: '◆' },
+];
+
+export default function ColorPicker({ config, onChange }: ColorPickerProps) {
+  const updateField = <K extends keyof CustomStudioConfig>(key: K, value: CustomStudioConfig[K]) => {
+    onChange({ ...config, [key]: value });
+  };
+
+  const toggleDecoration = (key: keyof CustomStudioConfig['decorations']) => {
+    onChange({
+      ...config,
+      decorations: {
+        ...config.decorations,
+        [key]: !config.decorations[key],
+      },
+    });
+  };
+
   return (
     <div
       data-testid="color-picker"
-      className="flex flex-wrap gap-6 rounded-xl bg-white/5 border border-white/10 px-5 py-4"
+      className="flex flex-col gap-5 rounded-xl bg-white/5 border border-white/10 px-5 py-4"
     >
-      <ColorField
-        label="Background Color"
-        value={background}
-        onChange={(bg) => onChange({ background: bg, accent })}
-      />
-      <ColorField
-        label="Accent Color"
-        value={accent}
-        onChange={(acc) => onChange({ background, accent: acc })}
-      />
+      {/* Color pickers */}
+      <div className="flex flex-wrap gap-6">
+        <ColorField
+          label="Background Color"
+          value={config.background}
+          onChange={(bg) => updateField('background', bg)}
+        />
+        <ColorField
+          label="Accent Color"
+          value={config.accent}
+          onChange={(acc) => updateField('accent', acc)}
+        />
+      </div>
+
+      {/* Border controls */}
+      <div className="flex flex-col gap-3">
+        <span className="text-xs text-white/60 font-medium uppercase tracking-wider">Border Style</span>
+        <div className="flex flex-wrap items-end gap-6">
+          {/* Border width slider */}
+          <div className="flex flex-col gap-1">
+            <label htmlFor="border-width-slider" className="text-xs text-white/50">
+              Width: {config.borderWidth}px
+            </label>
+            <input
+              id="border-width-slider"
+              type="range"
+              min={0}
+              max={10}
+              step={1}
+              value={config.borderWidth}
+              onChange={(e) => updateField('borderWidth', Number(e.target.value))}
+              className="w-32 accent-[#f4a261] cursor-pointer"
+              aria-label="Border width"
+            />
+          </div>
+          {/* Border color picker */}
+          <ColorField
+            label="Border Color"
+            value={config.borderColor}
+            onChange={(c) => updateField('borderColor', c)}
+          />
+        </div>
+      </div>
+
+      {/* Decoration toggles */}
+      <div className="flex flex-col gap-3">
+        <span className="text-xs text-white/60 font-medium uppercase tracking-wider">Decorations</span>
+        <div className="flex flex-wrap gap-2">
+          {DECORATION_OPTIONS.map(({ key, label, icon }) => {
+            const active = config.decorations[key];
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => toggleDecoration(key)}
+                aria-pressed={active}
+                className={[
+                  'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-150 cursor-pointer',
+                  'focus:outline-none focus:ring-2 focus:ring-[#f4a261]/60 focus:ring-offset-2 focus:ring-offset-transparent',
+                  active
+                    ? 'bg-[#f4a261]/20 text-[#f4a261] border border-[#f4a261]/40'
+                    : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10 hover:text-white/70',
+                ].join(' ')}
+              >
+                <span aria-hidden="true">{icon}</span>
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

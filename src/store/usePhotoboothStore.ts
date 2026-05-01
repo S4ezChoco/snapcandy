@@ -54,6 +54,16 @@ const defaultCustomizations: Customization = {
     brightness: 0,
     contrast: 0,
     saturation: 0,
+    exposure: 0,
+    temperature: 0,
+    tint: 0,
+    highlights: 0,
+    shadows: 0,
+    sharpness: 0,
+    vignette: 0,
+    grain: 0,
+    blur: 0,
+    fade: 0,
   },
   dateStamp: null,
   shape: {
@@ -105,7 +115,16 @@ export const usePhotoboothStore = create<PhotoboothStore>((set) => ({
 
   updateCustomizations: (updates) =>
     set((state) => ({
-      customizations: { ...state.customizations, ...updates },
+      customizations: {
+        ...state.customizations,
+        ...updates,
+        adjustments: updates.adjustments
+          ? { ...state.customizations.adjustments, ...updates.adjustments }
+          : state.customizations.adjustments,
+        shape: updates.shape
+          ? { ...state.customizations.shape, ...updates.shape }
+          : state.customizations.shape,
+      },
     })),
 
   resetAll: () =>

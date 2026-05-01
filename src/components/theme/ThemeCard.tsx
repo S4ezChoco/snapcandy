@@ -25,6 +25,42 @@ const PREVIEW_STYLES: Record<string, { background: string; decorHint: string }> 
     background: 'linear-gradient(135deg, #2d1b3d 0%, #4a2040 50%, #1f1030 100%)',
     decorHint: '✿',
   },
+  'neon-glow': {
+    background: 'linear-gradient(135deg, #2d1b69 0%, #1a0a2e 50%, #000000 100%)',
+    decorHint: '⬡',
+  },
+  'retro-90s': {
+    background: 'linear-gradient(135deg, #008080 0%, #6a0dad 100%)',
+    decorHint: '★',
+  },
+  'pastel-dream': {
+    background: 'linear-gradient(135deg, #f8c8dc 0%, #d8b4e2 50%, #c8a2d0 100%)',
+    decorHint: '❀',
+  },
+  'dark-academia': {
+    background: 'linear-gradient(135deg, #3e2723 0%, #2c2c2c 50%, #1a1a1a 100%)',
+    decorHint: '▣',
+  },
+  'tropical-sunset': {
+    background: 'linear-gradient(135deg, #ff6b35 0%, #ff1493 50%, #c71585 100%)',
+    decorHint: '✧',
+  },
+  'minimalist-white': {
+    background: 'linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #e8e8e8 100%)',
+    decorHint: '—',
+  },
+  'vintage-film': {
+    background: 'linear-gradient(135deg, #c4a882 0%, #8b6914 50%, #3e2723 100%)',
+    decorHint: '▤',
+  },
+  'cyberpunk': {
+    background: 'linear-gradient(135deg, #0a0a2a 0%, #1a0033 50%, #ff0066 100%)',
+    decorHint: '◇',
+  },
+  'cottagecore': {
+    background: 'linear-gradient(135deg, #8fbc8f 0%, #c8dbbe 50%, #faf3e0 100%)',
+    decorHint: '♥',
+  },
   'custom-studio': {
     background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
     decorHint: '✎',

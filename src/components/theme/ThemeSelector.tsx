@@ -1,10 +1,68 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ThemeId } from '../../types/theme';
+import type { ThemeId, CustomStudioConfig, DecorationElement } from '../../types/theme';
 import { THEME_PRESETS } from '../../config/themes';
 import { usePhotoboothStore } from '../../store/usePhotoboothStore';
 import ThemeCard from './ThemeCard';
 import ColorPicker from './ColorPicker';
+
+const DEFAULT_CUSTOM_CONFIG: CustomStudioConfig = {
+  background: '#1a1a2e',
+  accent: '#e07a5f',
+  borderWidth: 0,
+  borderColor: '#ffffff',
+  decorations: {
+    stars: false,
+    sparkles: false,
+    petals: false,
+    hearts: false,
+    geometric: false,
+  },
+};
+
+/**
+ * Generates random decoration elements based on the enabled decoration toggles.
+ * Uses the accent color for rendering.
+ */
+function generateDecorations(config: CustomStudioConfig): DecorationElement[] {
+  const decorations: DecorationElement[] = [];
+  const typeMap: Record<keyof CustomStudioConfig['decorations'], DecorationElement['type']> = {
+    stars: 'star',
+    sparkles: 'sparkle',
+    petals: 'petal',
+    hearts: 'heart',
+    geometric: 'geometric',
+  };
+
+  // Use a simple seeded approach for consistent-ish positions per type
+  let seed = 0;
+  const pseudoRandom = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return (seed % 1000) / 1000;
+  };
+
+  for (const [key, type] of Object.entries(typeMap) as [keyof CustomStudioConfig['decorations'], DecorationElement['type']][]) {
+    if (!config.decorations[key]) continue;
+
+    // Generate 4-6 decorations per enabled type
+    seed = key.charCodeAt(0) * 137; // seed per type for variety
+    const count = 4 + Math.floor(pseudoRandom() * 3);
+
+    for (let i = 0; i < count; i++) {
+      decorations.push({
+        type,
+        position: {
+          x: 0.05 + pseudoRandom() * 0.9,
+          y: 0.05 + pseudoRandom() * 0.9,
+        },
+        size: 6 + Math.floor(pseudoRandom() * 10),
+        opacity: 0.4 + pseudoRandom() * 0.4,
+      });
+    }
+  }
+
+  return decorations;
+}
 
 export default function ThemeSelector() {
   const navigate = useNavigate();
@@ -16,23 +74,25 @@ export default function ThemeSelector() {
     storedTheme?.id ?? null,
   );
 
-  const [customColors, setCustomColors] = useState<{ background: string; accent: string }>(
+  const [customConfig, setCustomConfig] = useState<CustomStudioConfig>(
     storedTheme?.id === 'custom-studio' && storedTheme.customColors
       ? storedTheme.customColors
-      : { background: '#1a1a2e', accent: '#e07a5f' },
+      : { ...DEFAULT_CUSTOM_CONFIG },
   );
 
   const handleNext = () => {
     const chosen = THEME_PRESETS.find((t) => t.id === selectedId);
     if (!chosen) return;
 
-    // For Custom Studio, merge in user-chosen colors
+    // For Custom Studio, merge in user-chosen config
     if (chosen.id === 'custom-studio') {
+      const decorations = generateDecorations(customConfig);
       setTheme({
         ...chosen,
-        background: `linear-gradient(135deg, ${customColors.background} 0%, ${customColors.background}cc 100%)`,
-        accentColor: customColors.accent,
-        customColors,
+        background: `linear-gradient(135deg, ${customConfig.background} 0%, ${customConfig.background}cc 100%)`,
+        accentColor: customConfig.accent,
+        decorations,
+        customColors: customConfig,
       });
     } else {
       setTheme(chosen);
@@ -85,13 +145,12 @@ export default function ThemeSelector() {
         ))}
       </div>
 
-      {/* Custom Studio color picker */}
+      {/* Custom Studio panel */}
       {selectedId === 'custom-studio' && (
         <div className="mt-6 w-full max-w-md animate-fade-slide-in">
           <ColorPicker
-            background={customColors.background}
-            accent={customColors.accent}
-            onChange={setCustomColors}
+            config={customConfig}
+            onChange={setCustomConfig}
           />
         </div>
       )}

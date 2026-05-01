@@ -1,7 +1,7 @@
 import type { LayoutConfig } from '../types/layout';
 import type { ThemeConfig } from '../types/theme';
 import type { CapturedPhoto } from '../types/capture';
-import type { Customization } from '../types/customization';
+import type { Customization, ImageAdjustments } from '../types/customization';
 import { calculatePixelPositions } from './layoutRenderer';
 import { drawThemeBackground, drawThemeDecorations } from './themeRenderer';
 import { getFilterString } from './filterRenderer';
@@ -23,6 +23,165 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
     img.onerror = (_e) => reject(new Error(`Failed to load image: ${src}`));
     img.src = src;
   });
+}
+
+function clampByte(value: number): number {
+  return Math.max(0, Math.min(255, value));
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+/**
+ * Applies post-processing pixel operations to the current canvas contents.
+ * This is intended to run AFTER photos are drawn and BEFORE overlays.
+ */
+export function applyCanvasAdjustments(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  adjustments: ImageAdjustments
+): void {
+  const highlights = adjustments.highlights ?? 0;
+  const shadows = adjustments.shadows ?? 0;
+  const sharpness = adjustments.sharpness ?? 0;
+  const vignette = adjustments.vignette ?? 0;
+  const grain = adjustments.grain ?? 0;
+  const fade = adjustments.fade ?? 0;
+
+  if (
+    highlights === 0 &&
+    shadows === 0 &&
+    sharpness === 0 &&
+    vignette === 0 &&
+    grain === 0 &&
+    fade === 0
+  ) {
+    return;
+  }
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  const highlightStrength = clamp01(Math.abs(highlights) / 100) * Math.sign(highlights);
+  const shadowStrength = clamp01(Math.abs(shadows) / 100) * Math.sign(shadows);
+  const fadeStrength = clamp01(fade / 100);
+
+  // 1) Highlights/Shadows/Fade (in-place)
+  for (let i = 0; i < data.length; i += 4) {
+    let r = data[i];
+    let g = data[i + 1];
+    let b = data[i + 2];
+
+    if (highlightStrength !== 0 || shadowStrength !== 0) {
+      const lum =
+        (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+
+      if (highlightStrength !== 0 && lum > 0.5) {
+        const t = clamp01((lum - 0.5) / 0.5);
+        const amt = highlightStrength * t;
+        if (amt > 0) {
+          r = r + (255 - r) * amt;
+          g = g + (255 - g) * amt;
+          b = b + (255 - b) * amt;
+        } else {
+          const scale = 1 + amt;
+          r = r * scale;
+          g = g * scale;
+          b = b * scale;
+        }
+      }
+
+      if (shadowStrength !== 0 && lum < 0.5) {
+        const t = clamp01((0.5 - lum) / 0.5);
+        const amt = shadowStrength * t;
+        if (amt > 0) {
+          r = r + (255 - r) * amt;
+          g = g + (255 - g) * amt;
+          b = b + (255 - b) * amt;
+        } else {
+          const scale = 1 + amt;
+          r = r * scale;
+          g = g * scale;
+          b = b * scale;
+        }
+      }
+    }
+
+    if (fadeStrength !== 0) {
+      r = r * (1 - fadeStrength) + 255 * fadeStrength;
+      g = g * (1 - fadeStrength) + 255 * fadeStrength;
+      b = b * (1 - fadeStrength) + 255 * fadeStrength;
+    }
+
+    data[i] = clampByte(r);
+    data[i + 1] = clampByte(g);
+    data[i + 2] = clampByte(b);
+  }
+
+  // 2) Sharpness (unsharp via simple cross kernel)
+  if (sharpness > 0) {
+    const amount = clamp01(sharpness / 100) * 0.6;
+    const src = new Uint8ClampedArray(data);
+
+    for (let y = 1; y < height - 1; y++) {
+      for (let x = 1; x < width - 1; x++) {
+        const idx = (y * width + x) * 4;
+
+        const left = idx - 4;
+        const right = idx + 4;
+        const up = idx - width * 4;
+        const down = idx + width * 4;
+
+        for (let c = 0; c < 3; c++) {
+          const center = src[idx + c];
+          const sharpened =
+            center * 5 -
+            src[left + c] -
+            src[right + c] -
+            src[up + c] -
+            src[down + c];
+          const blended = center * (1 - amount) + sharpened * amount;
+          data[idx + c] = clampByte(blended);
+        }
+      }
+    }
+  }
+
+  // 3) Vignette (darken edges)
+  if (vignette > 0) {
+    const strength = clamp01(vignette / 100) * 0.75;
+    const cx = (width - 1) / 2;
+    const cy = (height - 1) / 2;
+
+    for (let y = 0; y < height; y++) {
+      const dy = (y - cy) / cy;
+      for (let x = 0; x < width; x++) {
+        const dx = (x - cx) / cx;
+        const dist2 = clamp01((dx * dx + dy * dy) / 2);
+        const v = 1 - strength * dist2 * dist2;
+
+        const idx = (y * width + x) * 4;
+        data[idx] = clampByte(data[idx] * v);
+        data[idx + 1] = clampByte(data[idx + 1] * v);
+        data[idx + 2] = clampByte(data[idx + 2] * v);
+      }
+    }
+  }
+
+  // 4) Grain (add noise)
+  if (grain > 0) {
+    const amp = clamp01(grain / 100) * 20;
+    for (let i = 0; i < data.length; i += 4) {
+      const n = (Math.random() * 2 - 1) * amp;
+      data[i] = clampByte(data[i] + n);
+      data[i + 1] = clampByte(data[i + 1] + n);
+      data[i + 2] = clampByte(data[i + 2] + n);
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
 }
 
 /**
@@ -144,25 +303,6 @@ async function renderToCanvas(
       ctx.filter = 'none';
 
       ctx.restore();
-
-      // Draw border (outside clipping so it's visible)
-      if (customizations.shape.borderWidth > 0) {
-        ctx.save();
-        ctx.strokeStyle = customizations.shape.borderColor;
-        ctx.lineWidth = customizations.shape.borderWidth;
-
-        if (customizations.shape.borderRadius > 0) {
-          const radiusFraction = customizations.shape.borderRadius / 100;
-          const radius =
-            radiusFraction * Math.min(pos.width, pos.height) * 0.5;
-          roundedRectPath(ctx, pos.x, pos.y, pos.width, pos.height, radius);
-          ctx.stroke();
-        } else {
-          ctx.strokeRect(pos.x, pos.y, pos.width, pos.height);
-        }
-
-        ctx.restore();
-      }
     } catch {
       // Draw placeholder for failed images
       ctx.save();
@@ -181,16 +321,39 @@ async function renderToCanvas(
     }
   }
 
-  // 6. Draw sticker overlays
+  // 6. Post-process canvas adjustments (after photos, before overlays)
+  applyCanvasAdjustments(ctx, width, height, customizations.adjustments);
+
+  // 7. Draw borders (after adjustments so borders aren’t affected)
+  if (customizations.shape.borderWidth > 0) {
+    ctx.save();
+    ctx.strokeStyle = customizations.shape.borderColor;
+    ctx.lineWidth = customizations.shape.borderWidth;
+
+    positions.forEach((pos) => {
+      if (customizations.shape.borderRadius > 0) {
+        const radiusFraction = customizations.shape.borderRadius / 100;
+        const radius = radiusFraction * Math.min(pos.width, pos.height) * 0.5;
+        roundedRectPath(ctx, pos.x, pos.y, pos.width, pos.height, radius);
+        ctx.stroke();
+      } else {
+        ctx.strokeRect(pos.x, pos.y, pos.width, pos.height);
+      }
+    });
+
+    ctx.restore();
+  }
+
+  // 8. Draw sticker overlays
   drawStickers(ctx, customizations.stickers, width, height);
 
-  // 7. Draw text overlays
+  // 9. Draw text overlays
   drawTextOverlays(ctx, customizations.textOverlays, width, height);
 
-  // 8. Draw logo
+  // 10. Draw logo
   drawLogo(ctx, customizations.logo, width, height);
 
-  // 9. Draw date stamp
+  // 11. Draw date stamp
   drawDateStamp(ctx, customizations.dateStamp, width, height);
 }
 
@@ -231,6 +394,22 @@ export async function renderPreview(
 ): Promise<void> {
   const previewWidth = 500;
   const { width, height } = calculateCanvasDimensions(layout, previewWidth);
+  await renderToCanvas(canvas, layout, theme, photos, customizations, width, height);
+}
+
+/**
+ * Renders the strip at an explicit size.
+ * Useful for exports that need a specific resolution.
+ */
+export async function renderAtSize(
+  canvas: HTMLCanvasElement,
+  layout: LayoutConfig,
+  theme: ThemeConfig,
+  photos: CapturedPhoto[],
+  customizations: Customization,
+  width: number,
+  height: number
+): Promise<void> {
   await renderToCanvas(canvas, layout, theme, photos, customizations, width, height);
 }
 

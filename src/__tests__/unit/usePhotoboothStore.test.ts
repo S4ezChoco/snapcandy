@@ -35,7 +35,21 @@ describe('usePhotoboothStore', () => {
       expect(customizations.stickers).toEqual([]);
       expect(customizations.textOverlays).toEqual([]);
       expect(customizations.filter).toBeNull();
-      expect(customizations.adjustments).toEqual({ brightness: 0, contrast: 0, saturation: 0 });
+      expect(customizations.adjustments).toEqual({
+        brightness: 0,
+        contrast: 0,
+        saturation: 0,
+        exposure: 0,
+        temperature: 0,
+        tint: 0,
+        highlights: 0,
+        shadows: 0,
+        sharpness: 0,
+        vignette: 0,
+        grain: 0,
+        blur: 0,
+        fade: 0,
+      });
       expect(customizations.dateStamp).toBeNull();
       expect(customizations.shape).toEqual({ borderRadius: 0, borderWidth: 2, borderColor: '#ffffff' });
       expect(customizations.logo).toBeNull();
