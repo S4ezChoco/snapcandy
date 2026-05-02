@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { usePhotoboothStore } from '../../store/usePhotoboothStore';
 import type { ImageAdjustments } from '../../types/customization';
 import ConfirmationDialog from '../shared/ConfirmationDialog';
@@ -31,7 +31,7 @@ type AdjustmentKey = keyof ImageAdjustments;
 type SliderConfig = {
   key: AdjustmentKey;
   label: string;
-  icon?: JSX.Element;
+  icon?: React.ReactNode;
   min: number;
   max: number;
 };

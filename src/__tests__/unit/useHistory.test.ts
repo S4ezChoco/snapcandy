@@ -8,7 +8,12 @@ const defaultCustomization: Customization = {
   stickers: [],
   textOverlays: [],
   filter: null,
-  adjustments: { brightness: 0, contrast: 0, saturation: 0 },
+  adjustments: {
+    brightness: 0, contrast: 0, saturation: 0,
+    exposure: 0, temperature: 0, tint: 0,
+    highlights: 0, shadows: 0, sharpness: 0,
+    vignette: 0, grain: 0, blur: 0, fade: 0,
+  },
   dateStamp: null,
   shape: { borderRadius: 0, borderWidth: 2, borderColor: '#ffffff' },
   logo: null,
@@ -149,7 +154,12 @@ describe('useHistory', () => {
       for (let i = 0; i < 35; i++) {
         act(() => {
           usePhotoboothStore.getState().updateCustomizations({
-            adjustments: { brightness: i, contrast: 0, saturation: 0 },
+            adjustments: {
+              brightness: i, contrast: 0, saturation: 0,
+              exposure: 0, temperature: 0, tint: 0,
+              highlights: 0, shadows: 0, sharpness: 0,
+              vignette: 0, grain: 0, blur: 0, fade: 0,
+            },
           });
         });
       }
